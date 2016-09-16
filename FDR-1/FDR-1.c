@@ -37,7 +37,7 @@ void sensor_foo(unsigned char* TErr, unsigned char* scratchpad, unsigned char BU
 
 void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
 {
-  __disable_interrupt();  
+  cli();  
   while(EECR & (1<<EEWE));
   EEAR = uiAddress;     
   EEDR = ucData;        
@@ -51,7 +51,7 @@ void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
   //  if(EEDR==ucData) break; //
   // }//
   EEAR=0x00; 
-  __enable_interrupt();
+  sei();
 }
 
 

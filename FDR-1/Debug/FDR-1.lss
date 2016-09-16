@@ -254,7 +254,7 @@ Disassembly of section .text:
 
 void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
 {
-  __disable_interrupt();  
+  cli();  
      2a2:	f8 94       	cli
   while(EECR & (1<<EEWE));
      2a4:	e1 99       	sbic	0x1c, 1	; 28
@@ -291,7 +291,7 @@ void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
   EEAR=0x00; 
      2cc:	1f ba       	out	0x1f, r1	; 31
      2ce:	1e ba       	out	0x1e, r1	; 30
-  __enable_interrupt();
+  sei();
      2d0:	78 94       	sei
      2d2:	08 95       	ret
 
