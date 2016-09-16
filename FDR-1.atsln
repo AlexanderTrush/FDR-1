@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "FDR-1", "FDR-1\FDR-1.cproj", "{FC24946A-5D7E-4196-952E-DF7962C93B09}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC24946A-5D7E-4196-952E-DF7962C93B09}.Debug|AVR.ActiveCfg = Debug|AVR
+		{FC24946A-5D7E-4196-952E-DF7962C93B09}.Debug|AVR.Build.0 = Debug|AVR
+		{FC24946A-5D7E-4196-952E-DF7962C93B09}.Release|AVR.ActiveCfg = Release|AVR
+		{FC24946A-5D7E-4196-952E-DF7962C93B09}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
