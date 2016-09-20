@@ -586,25 +586,25 @@ unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
 	  cli();
 	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_DetectPresence(BUS);
-	  sei();
-	  cli();
-	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
+	  //sei();
+	  //cli();
+	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SkipRom(BUS);
-	  sei();
-	  cli();
-	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
+	  //sei();
+	  //cli();
+	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SendByte(DS18B20_CONVERT_T ,BUS);
-	  sei();
-	  cli();
-	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
+	  //sei();
+	  //cli();
+	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_DetectPresence(BUS);
-	  sei();
-	  cli();
-	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
+	  //sei();
+	  //cli();
+	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SkipRom(BUS);
-	  sei();
-	  cli();
-	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
+	  //sei();
+	  //cli();
+	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SendByte(DS18B20_READ_SCRATCHPAD, BUS);
 	  for (i = 0; i<=8; i++)
 	  {
@@ -773,11 +773,12 @@ int main( void )
 	
 	if (SPEED != SPEEDM)
 	{
-		if (speed_timer==0){
+		if (speed_timer==0 || SPEEDM==0){
 			PORTD&=~(1<<PIND2);
 			PORTD&=~(1<<PIND3);
 			PORTD&=~(1<<PIND4);
-			speed_timer = 1;
+			SPEED = 0; 
+			if (SPEEDM>0) speed_timer = 1;
 		}
 		else if (speed_timer>=5000)
 		{
