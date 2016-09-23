@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
+#include <avr/interrupt.h>
 
 //подключение заголовочных файлов 1Wire библиотеки
 #include "OWI\OWIPolled.h"
@@ -29,15 +30,13 @@
 #define DS18B20_READ_SCRATCHPAD          0xbe
 
 unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen);
-void mb_read(unsigned short registr, unsigned short data);
-void mb_write(unsigned short registr, unsigned short data);
-void sensor_foo(unsigned char* TErr, unsigned char* scratchpad, unsigned char BUS, unsigned char* SENSOR, short* T);
+void sensor_foo(unsigned char* TErr, unsigned char BUS, unsigned char* SENSOR, short* T);
 
-
+char interr =0 ;
 
 void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
 {
-  cli();  
+  asm ("CLI");
   while(EECR & (1<<EEWE));
   EEAR = uiAddress;     
   EEDR = ucData;        
@@ -51,7 +50,7 @@ void Write_EEPROM (unsigned int uiAddress, unsigned char ucData)
   //  if(EEDR==ucData) break; //
   // }//
   EEAR=0x00; 
-  sei();
+  asm ("SEI");
 }
 
 
@@ -67,19 +66,20 @@ unsigned char Read_EEPROM (unsigned int uiAddress)
 //----------------------------------------------------------------
 uint32_t timer0=0;
 uint32_t speed_timer=0;
-unsigned char ANSWER_BUF[255];
+char speed_timer_started=0;
+unsigned char ANSWER_BUF[17];
 unsigned char ANSWER_LEN=0;
 unsigned char ANSWER_POINTER=0;
 
-unsigned char scratchpad1[9];
-unsigned char scratchpad2[9];
+unsigned char scratchpad[9];
 
 unsigned char BR = 250;
+unsigned char sensor_na = 0;
 unsigned char RX = 0;
 
 unsigned char ADDRESS, RS2, ADD1, BOUD;
 unsigned char SPEED, SPEEDM;
-unsigned char UDRbuf[255];
+unsigned char UDRbuf[8];
 
 unsigned char TErr1,TErr2;
 
@@ -248,7 +248,7 @@ void init_devices(void)
  // OWI_Init(BUS3);  
   MCUCR = 0x00;
   GICR  = 0x00;
-  TIMSK = 0x41; //timer interrupt sources
+  TIMSK = 1;//0x41; //timer interrupt sources
   asm ("SEI"); //re-enable interrupts
    
   //all peripherals are now initialized
@@ -272,6 +272,7 @@ ISR(USART_UDRE_vect)
 		else
 		{
 			while (!(UCSRA & (1 << TXC)));
+			sensor_na = 0;
 			PORTD|=(1<<PIND7); //LED TX OFF
 			PORTA&=~(1<<7);
 			UCSRB |= (1<<RXEN);
@@ -285,11 +286,13 @@ ISR(USART_UDRE_vect)
 ISR(USARTRXC_vect)
 {
 	
-	unsigned short crc;
-  PORTD&=~(1<<PIND6); //LED RX ON
-  cli();
-            
-  UDRbuf[RX] = UDR;
+  unsigned short crc;
+  unsigned short registr;
+  unsigned short data;
+  unsigned char DATA_BUF[12];
+  //TIMSK = 0;
+  PORTD&=~(1<<PIND6); //LED RX ON         
+  if (RX<8) UDRbuf[RX] = UDR;
   
   
    switch(RX)
@@ -325,100 +328,79 @@ ISR(USARTRXC_vect)
 	   crc = CRC16(UDRbuf, 6);
 	   if (((crc & 0xFF)==UDRbuf[7]) && ((crc>>8)==UDRbuf[6]))
 	   {
-		   if (UDRbuf[1]==3) mb_read((UDRbuf[2]<<8)+UDRbuf[3],(UDRbuf[4]<<8)+UDRbuf[5]);
-		   else mb_write((UDRbuf[2]<<8)+UDRbuf[3],(UDRbuf[4]<<8)+UDRbuf[5]);
-		   {RX=0; PORTD|=(1<<PIND6);}
+		   sensor_na = 1;
+		   registr = (UDRbuf[2]<<8)+UDRbuf[3];
+		   data = (UDRbuf[4]<<8)+UDRbuf[5];
+		   if (UDRbuf[1]==3) 
+		   {
+			   DATA_BUF[0]=0;
+			   DATA_BUF[1]=SPEED;
+			   DATA_BUF[2]=0;
+			   DATA_BUF[3]=VALVE;
+			   DATA_BUF[4]=0;
+			   DATA_BUF[5]=SETPOINT;
+			   DATA_BUF[6]=SENSOR1[1];
+			   DATA_BUF[7]=SENSOR1[0];
+			   DATA_BUF[8]=SENSOR2[1];
+			   DATA_BUF[9]=SENSOR2[0];
+			   DATA_BUF[10]=SENSOR3[1];
+			   DATA_BUF[11]=SENSOR3[0];
+			   ANSWER_BUF[0]=RS2;
+			   ANSWER_BUF[1]=3;
+			   ANSWER_BUF[2]=data*2;
+			   for (char an=0; an<data*2; an++) ANSWER_BUF[an+3] = DATA_BUF[an+registr*2];
+			   crc = CRC16(ANSWER_BUF, 3+data*2);
+			   ANSWER_BUF[3+data*2] = crc>>8;
+			   ANSWER_BUF[4+data*2] = crc;
+			   ANSWER_LEN = 5+data*2;
+			   ANSWER_POINTER = 0;
+		   }
+		   else
+		   {
+			   for(int k = 0; k < 8; k++) ANSWER_BUF[k]=UDRbuf[k];
+			   ANSWER_LEN = 8;
+			   ANSWER_POINTER = 0;
+			   if (registr==0)//speed
+			   {
+				  	if (data<4)  SPEEDM = data;
+				  	else SPEEDM = 3;
+			   }
+			   else if (registr == 1)//valve
+			   {
+				  	if (data<2)  VALVEM = data;
+				   	else VALVEM = 1;
+			   }
+			   else if (registr == 2)//stp
+			   {
+				  	SETPOINTm = data;
+			   }
+		   }
+		   // Включение передачи
+		   PORTA|=(1<<7);  //Enable Tx, Disable Rx
+		   PORTD&=~(1<<PIND7); //LED TX ON
+		   UCSRB &=~ (1<<RXEN);
+		   UCSRB |= (1<<TXEN);
+		   
+		   RX=0; 
+		   PORTD|=(1<<PIND6);
 	   }
 	   else {RX=0; PORTD|=(1<<PIND6);}
 	   break;
 	   default: {RX=0; PORTD|=(1<<PIND6);}
    } 
-  sei();
-  
+
 }
 //----------------------------------
-
-void mb_read(unsigned short registr, unsigned short data)
-{
-	unsigned short crc;
-	unsigned char DATA_BUF[12];
-	DATA_BUF[0]=0;
-	DATA_BUF[1]=SPEED;
-	DATA_BUF[2]=0;
-	DATA_BUF[3]=VALVE;
-	DATA_BUF[4]=0;
-	DATA_BUF[5]=SETPOINT;
-	DATA_BUF[6]=SENSOR1[1];
-	DATA_BUF[7]=SENSOR1[0];
-	DATA_BUF[8]=SENSOR2[1];
-	DATA_BUF[9]=SENSOR2[0];
-	DATA_BUF[10]=SENSOR3[1];
-	DATA_BUF[11]=SENSOR3[0];
-	ANSWER_BUF[0]=RS2;
-	ANSWER_BUF[1]=3;
-	ANSWER_BUF[2]=data*2;
-	for (char an=0; an<data*2; an++) ANSWER_BUF[an+3] = DATA_BUF[an+registr*2];
-	crc = CRC16(ANSWER_BUF, 3+data*2);
-	ANSWER_BUF[3+data*2] = crc>>8;
-	ANSWER_BUF[4+data*2] = crc;
-	ANSWER_LEN = 5+data*2;
-	ANSWER_POINTER = 0;
-	
-	// Включение передачи
-	PORTA|=(1<<7);  //Enable Tx, Disable Rx
-	PORTD&=~(1<<PIND7); //LED TX ON
-	UCSRB &=~ (1<<RXEN);
-	UCSRB |= (1<<TXEN);
-	
-}
-
-void mb_write(unsigned short registr, unsigned short data)
-{
-	
-	for(int k = 0; k < 8; k++) ANSWER_BUF[k]=UDRbuf[k];
-	ANSWER_LEN = 8;
-	ANSWER_POINTER = 0;
-	// Включение передачи
-	PORTA|=(1<<7);  //Enable Tx, Disable Rx
-	PORTD&=~(1<<PIND7); //LED TX ON
-	UCSRB &=~ (1<<RXEN);
-	UCSRB |= (1<<TXEN);
-	
-	
-	
-	if (registr==0)//speed
-	{
-		if (data<4)  SPEEDM = data;
-		else SPEEDM = 3;
-	}
-	else if (registr == 1)//valve
-	{
-		if (data<2)  VALVEM = data;
-		else VALVEM = 1;
-	}
-	else if (registr == 2)//stp
-	{
-		SETPOINTm = data;
-	}
-	
-}
 
 
 
 ISR(TIMER0_OVF_vect)
 {
-	
   //TIMER0 has overflowed
   TCNT0 = 0xA4; //reload counter
   TCCR0 = 0x02; //start timer
-  timer0++;
-  
-  if (speed_timer>0)speed_timer++;
-  
-  
-  if (timer0==70000) sensor_foo(&TErr1, scratchpad1, BUS1, SENSOR1, &TREG);
-  if (timer0==140000) sensor_foo(&TErr2, scratchpad2, BUS2, SENSOR2, &TWAT);
-  if (timer0>140000)timer0=0;//14sec 
+  if (timer0!=70000 && timer0!=140000) timer0++;
+  if (speed_timer_started) speed_timer++;
   
   if ((PINA&1)==0)
   {
@@ -542,7 +524,7 @@ unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
 //------------------------------------------------------------------------
 
  //----------CRC-SENSOR---------------
- unsigned char CRC_Dall (unsigned char * scratchpad)
+ unsigned char CRC_Dall ()
  {
 	 unsigned char j, i, Data, tmpd, CRCd = 0;
 	 for (j = 0; j < 8; j++)
@@ -562,7 +544,7 @@ unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
 	 return CRCd;
  }
  
- short t_calculate(unsigned char * scratchpad)
+ short t_calculate()
  {
 	 short temperature;
 	 if (scratchpad[1] & 0x80)//отрицательное
@@ -579,50 +561,40 @@ unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
  }
  
  
- void sensor_foo(unsigned char* TErr, unsigned char* scratchpad, unsigned char BUS, unsigned char* SENSOR, short* T)
+ void sensor_foo(unsigned char* TErr, unsigned char BUS, unsigned char* SENSOR, short* T)
  {
 	 int i;
-	  TErr[0]++;
-	  cli();
+	 short temp_t;
+	while (sensor_na);
+	  asm ("CLI");
 	  PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_DetectPresence(BUS);
-	  //sei();
-	  //cli();
-	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SkipRom(BUS);
-	  //sei();
-	  //cli();
-	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SendByte(DS18B20_CONVERT_T ,BUS);
-	  //sei();
-	  //cli();
-	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_DetectPresence(BUS);
-	  //sei();
-	  //cli();
-	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SkipRom(BUS);
-	  //sei();
-	  //cli();
-	  //PORTA|=(0x0E);  //Очистка PA1, PA2, PA3 
 	  OWI_SendByte(DS18B20_READ_SCRATCHPAD, BUS);
 	  for (i = 0; i<=8; i++)
 	  {
 		  scratchpad[i] = OWI_ReceiveByte(BUS);
 	  }
-	  sei();
+	  asm ("SEI");
+	  
+	  	if (timer0==70000) timer0++;
+	  	else if (timer0==140000) timer0=0;
 	  
 	  //--------------------------------
-	  if ((CRC_Dall(scratchpad) == scratchpad[8]))
+	  if ((CRC_Dall() == scratchpad[8]))
 	  {
-		  TErr[0] = 0;
-		  short temp_t = t_calculate(scratchpad);
+		  *TErr = 0;
+		  temp_t = t_calculate();
 		  *T= temp_t;
 		  SENSOR[0] = temp_t;
 		  SENSOR[1] = temp_t>>8;
 	  }
+	  else (*TErr)++;
 	  
-	  if (TErr[0] > 6)
+	  if ((*TErr) > 5)
 	  {
 		  SENSOR[0]=1;
 		  SENSOR[1]=128;
@@ -691,7 +663,9 @@ int main( void )
 		BR = BOUD;
 	}
     
-
+	if (timer0==70000) sensor_foo(&TErr1, BUS1, SENSOR1, &TREG);
+	if (timer0==140000) sensor_foo(&TErr2, BUS2, SENSOR2, &TWAT);
+	
    
     //------------------------------------
  
@@ -761,11 +735,11 @@ int main( void )
 			d3=26;
 		break;		
 	}
-	cli();
+	asm ("CLI");
 			Disp1=Dig[d1];
 			Disp2=Dig[d2];
 			Disp3=Dig[d3];
-	sei();  
+	asm ("SEI");
 	  
    
     //------------------------------------------------------
@@ -773,29 +747,28 @@ int main( void )
 	
 	if (SPEED != SPEEDM)
 	{
-		if (speed_timer==0 || SPEEDM==0){
-			PORTD&=~(1<<PIND2);
-			PORTD&=~(1<<PIND3);
-			PORTD&=~(1<<PIND4);
-			SPEED = 0; 
-			if (SPEEDM>0) speed_timer = 1;
-		}
-		else if (speed_timer>=5000)
+		if (speed_timer>=5000 && speed_timer_started && (PORTD&0b00011100)==0)
 		{
-			speed_timer=0;
 			SPEED = SPEEDM;
+			speed_timer = 0;
+			speed_timer_started = 0;
 			if (SPEED==1)
 			{
-				PORTD|=(1<<PIND2); 
+				PORTD|=4;
 			}
 			else if (SPEED==2)
 			{
-				PORTD|=(1<<PIND3); 
+				PORTD|=8;
 			}
 			else if (SPEED>=3)
 			{
-				PORTD|=(1<<PIND4);
+				PORTD|=16;
 			}
+		}
+		else if (!speed_timer_started)
+		{
+			PORTD&=0b11100011;
+			speed_timer_started = 1;
 		}
 	}
 	

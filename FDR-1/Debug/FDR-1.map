@@ -18,17 +18,17 @@ Common symbol       size              file
 
 SETPOINT            0x1               FDR-1.o
 Num                 0x4               FDR-1.o
+scratchpad          0x9               FDR-1.o
 Disp2               0x1               FDR-1.o
 VALVEM              0x1               FDR-1.o
 SETPOINTm           0x1               FDR-1.o
 RS2                 0x1               FDR-1.o
 d1                  0x2               FDR-1.o
 TErr1               0x1               FDR-1.o
-UDRbuf              0xff              FDR-1.o
-ANSWER_BUF          0xff              FDR-1.o
+UDRbuf              0x8               FDR-1.o
+ANSWER_BUF          0x11              FDR-1.o
 Disp1               0x1               FDR-1.o
 SPEEDM              0x1               FDR-1.o
-scratchpad2         0x9               FDR-1.o
 d2                  0x2               FDR-1.o
 Dig                 0x1e              FDR-1.o
 SPEED               0x1               FDR-1.o
@@ -36,7 +36,6 @@ TErr2               0x1               FDR-1.o
 VALVE               0x1               FDR-1.o
 ADDRESS             0x1               FDR-1.o
 ADD1                0x1               FDR-1.o
-scratchpad1         0x9               FDR-1.o
 BOUD                0x1               FDR-1.o
 Disp3               0x1               FDR-1.o
 d3                  0x2               FDR-1.o
@@ -48,6 +47,7 @@ Discarded input sections
  .text          0x00000000        0x0 FDR-1.o
  .data          0x00000000        0x0 FDR-1.o
  .bss           0x00000000        0x0 FDR-1.o
+ .bss.interr    0x00000000        0x1 FDR-1.o
  .text          0x00000000        0x0 OWI/OWIBitFunctions.o
  .data          0x00000000        0x0 OWI/OWIBitFunctions.o
  .bss           0x00000000        0x0 OWI/OWIBitFunctions.o
@@ -295,7 +295,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x1182
+.text           0x00000000     0x11a2
  *(.vectors)
  .vectors       0x00000000       0x54 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr5/crtm16a.o
                 0x00000000                __vector_default
@@ -406,71 +406,66 @@ END GROUP
                 0x0000040a       0x34 FDR-1.o
                 0x0000040a                init_devices
  .text.__vector_12
-                0x0000043e       0x5c FDR-1.o
+                0x0000043e       0x60 FDR-1.o
                 0x0000043e                __vector_12
- .text.mb_write
-                0x0000049a       0x64 FDR-1.o
-                0x0000049a                mb_write
- .text.CRC16    0x000004fe       0x3e FDR-1.o
-                0x000004fe                CRC16
- .text.mb_read  0x0000053c      0x102 FDR-1.o
-                0x0000053c                mb_read
- .text.__vector_11
-                0x0000063e      0x1ae FDR-1.o
-                0x0000063e                __vector_11
- .text.CRC_Dall
-                0x000007ec       0x24 FDR-1.o
-                0x000007ec                CRC_Dall
- .text.t_calculate
-                0x00000810       0xd2 FDR-1.o
-                0x00000810                t_calculate
- .text.sensor_foo
-                0x000008e2       0xd4 FDR-1.o
-                0x000008e2                sensor_foo
  .text.__vector_9
-                0x000009b6      0x1fc FDR-1.o
-                0x000009b6                __vector_9
- .text.main     0x00000bb2      0x422 FDR-1.o
-                0x00000bb2                main
+                0x0000049e      0x176 FDR-1.o
+                0x0000049e                __vector_9
+ .text.CRC16    0x00000614       0x3e FDR-1.o
+                0x00000614                CRC16
+ .text.__vector_11
+                0x00000652      0x2fc FDR-1.o
+                0x00000652                __vector_11
+ .text.CRC_Dall
+                0x0000094e       0x2a FDR-1.o
+                0x0000094e                CRC_Dall
+ .text.t_calculate
+                0x00000978       0xd4 FDR-1.o
+                0x00000978                t_calculate
+ .text.sensor_foo
+                0x00000a4c      0x12e FDR-1.o
+                0x00000a4c                sensor_foo
+ .text.main     0x00000b7a      0x47a FDR-1.o
+                0x00000b7a                main
  .text.OWI_Init
-                0x00000fd4       0x1c OWI/OWIBitFunctions.o
-                0x00000fd4                OWI_Init
+                0x00000ff4       0x1c OWI/OWIBitFunctions.o
+                0x00000ff4                OWI_Init
  .text.OWI_WriteBit1
-                0x00000ff0       0x2c OWI/OWIBitFunctions.o
-                0x00000ff0                OWI_WriteBit1
+                0x00001010       0x2c OWI/OWIBitFunctions.o
+                0x00001010                OWI_WriteBit1
  .text.OWI_WriteBit0
-                0x0000101c       0x2e OWI/OWIBitFunctions.o
-                0x0000101c                OWI_WriteBit0
+                0x0000103c       0x2e OWI/OWIBitFunctions.o
+                0x0000103c                OWI_WriteBit0
  .text.OWI_ReadBit
-                0x0000104a       0x3a OWI/OWIBitFunctions.o
-                0x0000104a                OWI_ReadBit
+                0x0000106a       0x3a OWI/OWIBitFunctions.o
+                0x0000106a                OWI_ReadBit
  .text.OWI_DetectPresence
-                0x00001084       0x42 OWI/OWIBitFunctions.o
-                0x00001084                OWI_DetectPresence
+                0x000010a4       0x42 OWI/OWIBitFunctions.o
+                0x000010a4                OWI_DetectPresence
  .text.OWI_SendByte
-                0x000010c6       0x2c OWI/OWIHighLevelFunctions.o
-                0x000010c6                OWI_SendByte
+                0x000010e6       0x2c OWI/OWIHighLevelFunctions.o
+                0x000010e6                OWI_SendByte
  .text.OWI_ReceiveByte
-                0x000010f2       0x26 OWI/OWIHighLevelFunctions.o
-                0x000010f2                OWI_ReceiveByte
+                0x00001112       0x26 OWI/OWIHighLevelFunctions.o
+                0x00001112                OWI_ReceiveByte
  .text.OWI_SkipRom
-                0x00001118        0xa OWI/OWIHighLevelFunctions.o
-                0x00001118                OWI_SkipRom
+                0x00001138        0xa OWI/OWIHighLevelFunctions.o
+                0x00001138                OWI_SkipRom
  .text.libgcc.div
-                0x00001122       0x28 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_divmodhi4.o)
-                0x00001122                _div
-                0x00001122                __divmodhi4
- .text.libgcc   0x0000114a        0xc c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_tablejump.o)
-                0x0000114a                __tablejump2__
-                0x0000114e                __tablejump__
+                0x00001142       0x28 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_divmodhi4.o)
+                0x00001142                _div
+                0x00001142                __divmodhi4
+ .text.libgcc   0x0000116a        0xc c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_tablejump.o)
+                0x0000116a                __tablejump2__
+                0x0000116e                __tablejump__
  .text.libgcc.div
-                0x00001156       0x28 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_udivmodhi4.o)
-                0x00001156                __udivmodhi4
-                0x0000117e                . = ALIGN (0x2)
+                0x00001176       0x28 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_udivmodhi4.o)
+                0x00001176                __udivmodhi4
+                0x0000119e                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000117e        0x0 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_exit.o)
-                0x0000117e                _exit
-                0x0000117e                exit
+ .fini9         0x0000119e        0x0 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_exit.o)
+                0x0000119e                _exit
+                0x0000119e                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -489,11 +484,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000117e        0x4 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_exit.o)
+ .fini0         0x0000119e        0x4 c:/program files/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00001182                _etext = .
+                0x000011a2                _etext = .
 
-.data           0x00800060        0xa load address 0x00001182
+.data           0x00800060        0xa load address 0x000011a2
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -515,7 +510,7 @@ END GROUP
                 0x0080006a                _edata = .
                 0x0080006a                PROVIDE (__data_end, .)
 
-.bss            0x0080006a      0x25b
+.bss            0x0080006a       0x6f
                 0x0080006a                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
@@ -533,53 +528,58 @@ END GROUP
                 0x00800071                SENSOR3
  .bss.RX        0x00800073        0x1 FDR-1.o
                 0x00800073                RX
- .bss.ANSWER_POINTER
+ .bss.sensor_na
                 0x00800074        0x1 FDR-1.o
-                0x00800074                ANSWER_POINTER
- .bss.ANSWER_LEN
+                0x00800074                sensor_na
+ .bss.ANSWER_POINTER
                 0x00800075        0x1 FDR-1.o
-                0x00800075                ANSWER_LEN
+                0x00800075                ANSWER_POINTER
+ .bss.ANSWER_LEN
+                0x00800076        0x1 FDR-1.o
+                0x00800076                ANSWER_LEN
+ .bss.speed_timer_started
+                0x00800077        0x1 FDR-1.o
+                0x00800077                speed_timer_started
  .bss.speed_timer
-                0x00800076        0x4 FDR-1.o
-                0x00800076                speed_timer
- .bss.timer0    0x0080007a        0x4 FDR-1.o
-                0x0080007a                timer0
+                0x00800078        0x4 FDR-1.o
+                0x00800078                speed_timer
+ .bss.timer0    0x0080007c        0x4 FDR-1.o
+                0x0080007c                timer0
  *(COMMON)
- COMMON         0x0080007e      0x247 FDR-1.o
-                0x0080007e                SETPOINT
-                0x0080007f                Num
-                0x00800083                Disp2
-                0x00800084                VALVEM
-                0x00800085                SETPOINTm
-                0x00800086                RS2
-                0x00800087                d1
-                0x00800089                TErr1
-                0x0080008a                UDRbuf
-                0x00800189                ANSWER_BUF
-                0x00800288                Disp1
-                0x00800289                SPEEDM
-                0x0080028a                scratchpad2
-                0x00800293                d2
-                0x00800295                Dig
-                0x008002b3                SPEED
-                0x008002b4                TErr2
-                0x008002b5                VALVE
-                0x008002b6                ADDRESS
-                0x008002b7                ADD1
-                0x008002b8                scratchpad1
-                0x008002c1                BOUD
-                0x008002c2                Disp3
-                0x008002c3                d3
-                0x008002c5                PROVIDE (__bss_end, .)
-                0x00001182                __data_load_start = LOADADDR (.data)
-                0x0000118c                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00800080       0x59 FDR-1.o
+                0x00800080                SETPOINT
+                0x00800081                Num
+                0x00800085                scratchpad
+                0x0080008e                Disp2
+                0x0080008f                VALVEM
+                0x00800090                SETPOINTm
+                0x00800091                RS2
+                0x00800092                d1
+                0x00800094                TErr1
+                0x00800095                UDRbuf
+                0x0080009d                ANSWER_BUF
+                0x008000ae                Disp1
+                0x008000af                SPEEDM
+                0x008000b0                d2
+                0x008000b2                Dig
+                0x008000d0                SPEED
+                0x008000d1                TErr2
+                0x008000d2                VALVE
+                0x008000d3                ADDRESS
+                0x008000d4                ADD1
+                0x008000d5                BOUD
+                0x008000d6                Disp3
+                0x008000d7                d3
+                0x008000d9                PROVIDE (__bss_end, .)
+                0x000011a2                __data_load_start = LOADADDR (.data)
+                0x000011ac                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008002c5        0x0
-                0x008002c5                PROVIDE (__noinit_start, .)
+.noinit         0x008000d9        0x0
+                0x008000d9                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x008002c5                PROVIDE (__noinit_end, .)
-                0x008002c5                _end = .
-                0x008002c5                PROVIDE (__heap_start, .)
+                0x008000d9                PROVIDE (__noinit_end, .)
+                0x008000d9                _end = .
+                0x008000d9                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -640,56 +640,56 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x148
+.debug_aranges  0x00000000      0x138
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0xb0 FDR-1.o
+                0x00000000       0xa0 FDR-1.o
  .debug_aranges
-                0x000000b0       0x40 OWI/OWIBitFunctions.o
+                0x000000a0       0x40 OWI/OWIBitFunctions.o
  .debug_aranges
-                0x000000f0       0x58 OWI/OWIHighLevelFunctions.o
+                0x000000e0       0x58 OWI/OWIHighLevelFunctions.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x1498
+.debug_info     0x00000000     0x13e4
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0xb20 FDR-1.o
- .debug_info    0x00000b20      0x406 OWI/OWIBitFunctions.o
- .debug_info    0x00000f26      0x572 OWI/OWIHighLevelFunctions.o
+ .debug_info    0x00000000      0xa6c FDR-1.o
+ .debug_info    0x00000a6c      0x406 OWI/OWIBitFunctions.o
+ .debug_info    0x00000e72      0x572 OWI/OWIHighLevelFunctions.o
 
-.debug_abbrev   0x00000000      0x57b
+.debug_abbrev   0x00000000      0x56c
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x266 FDR-1.o
- .debug_abbrev  0x00000266      0x130 OWI/OWIBitFunctions.o
- .debug_abbrev  0x00000396      0x1e5 OWI/OWIHighLevelFunctions.o
+ .debug_abbrev  0x00000000      0x257 FDR-1.o
+ .debug_abbrev  0x00000257      0x130 OWI/OWIBitFunctions.o
+ .debug_abbrev  0x00000387      0x1e5 OWI/OWIHighLevelFunctions.o
 
-.debug_line     0x00000000      0x804
+.debug_line     0x00000000      0x7e7
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x489 FDR-1.o
- .debug_line    0x00000489      0x1da OWI/OWIBitFunctions.o
- .debug_line    0x00000663      0x1a1 OWI/OWIHighLevelFunctions.o
+ .debug_line    0x00000000      0x46c FDR-1.o
+ .debug_line    0x0000046c      0x1da OWI/OWIBitFunctions.o
+ .debug_line    0x00000646      0x1a1 OWI/OWIHighLevelFunctions.o
 
-.debug_frame    0x00000000      0x428
+.debug_frame    0x00000000      0x3d8
  *(.debug_frame)
- .debug_frame   0x00000000      0x26c FDR-1.o
- .debug_frame   0x0000026c       0x64 OWI/OWIBitFunctions.o
- .debug_frame   0x000002d0      0x158 OWI/OWIHighLevelFunctions.o
+ .debug_frame   0x00000000      0x21c FDR-1.o
+ .debug_frame   0x0000021c       0x64 OWI/OWIBitFunctions.o
+ .debug_frame   0x00000280      0x158 OWI/OWIHighLevelFunctions.o
 
-.debug_str      0x00000000      0x5af
+.debug_str      0x00000000      0x5ab
  *(.debug_str)
- .debug_str     0x00000000      0x3f8 FDR-1.o
-                                0x448 (size before relaxing)
- .debug_str     0x000003f8       0xa2 OWI/OWIBitFunctions.o
+ .debug_str     0x00000000      0x3f4 FDR-1.o
+                                0x444 (size before relaxing)
+ .debug_str     0x000003f4       0xa2 OWI/OWIBitFunctions.o
                                 0x216 (size before relaxing)
- .debug_str     0x0000049a      0x115 OWI/OWIHighLevelFunctions.o
+ .debug_str     0x00000496      0x115 OWI/OWIHighLevelFunctions.o
                                 0x2d6 (size before relaxing)
 
-.debug_loc      0x00000000     0x1484
+.debug_loc      0x00000000     0x130b
  *(.debug_loc)
- .debug_loc     0x00000000      0x940 FDR-1.o
- .debug_loc     0x00000940      0x126 OWI/OWIBitFunctions.o
- .debug_loc     0x00000a66      0xa1e OWI/OWIHighLevelFunctions.o
+ .debug_loc     0x00000000      0x7c7 FDR-1.o
+ .debug_loc     0x000007c7      0x126 OWI/OWIBitFunctions.o
+ .debug_loc     0x000008ed      0xa1e OWI/OWIHighLevelFunctions.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -709,11 +709,11 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x118
+.debug_ranges   0x00000000      0x108
  *(.debug_ranges)
- .debug_ranges  0x00000000       0xa0 FDR-1.o
- .debug_ranges  0x000000a0       0x30 OWI/OWIBitFunctions.o
- .debug_ranges  0x000000d0       0x48 OWI/OWIHighLevelFunctions.o
+ .debug_ranges  0x00000000       0x90 FDR-1.o
+ .debug_ranges  0x00000090       0x30 OWI/OWIBitFunctions.o
+ .debug_ranges  0x000000c0       0x48 OWI/OWIHighLevelFunctions.o
 
 .debug_macro
  *(.debug_macro)
